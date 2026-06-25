@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plantilla de Espiritus</title>
+  <style>
+    :root {
+      --bg: #080914;
+      --panel: #111526;
+      --panel-2: #171d31;
+      --line: #2c3657;
+      --text: #f7f8ff;
+      --muted: #aeb8d7;
+      --accent: #ffcc31;
+      --cyan: #31d8ff;
+      --green: #35dd7b;
+      --red: #ff5b51;
+      --pink: #ff58bc;
+      --purple: #b279ff;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 16% 8%, rgba(255, 204, 49, .18), transparent 26rem),
+        radial-gradient(circle at 84% 16%, rgba(49, 216, 255, .18), transparent 24rem),
+        linear-gradient(135deg, #070711 0%, #111224 54%, #080914 100%);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1500px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 40px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      background: rgba(11, 14, 27, .86);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand-banner {
+      display: block;
+      width: 100%;
+      height: clamp(230px, 22vw, 360px);
+      object-fit: cover;
+      object-position: center;
+      margin: 0 0 16px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      background: #0c1020;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.5rem);
+      line-height: .92;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
+
+    .profile {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+      width: min(420px, 100%);
+      min-width: 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label,
+    .label {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      min-height: 42px;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0c1020;
+      padding: 0 12px;
+      outline: none;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(49, 216, 255, .16);
+    }
+
+    .button {
+      min-height: 42px;
+      border: 0;
+      border-radius: 8px;
+      color: #111;
+      background: var(--accent);
+      padding: 0 16px;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .button.secondary {
+      color: var(--text);
+      border: 1px solid var(--line);
+      background: #11172a;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(210px, 1fr) minmax(210px, 1fr) minmax(210px, 1fr) auto auto auto;
+      gap: 12px;
+      align-items: end;
+      margin: 16px 0;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 8px;
+      background: rgba(17, 21, 38, .88);
+    }
+
+    .download-row {
+      display: grid;
+      grid-template-columns: minmax(210px, 320px) auto;
+      gap: 12px;
+      align-items: end;
+      margin: -4px 0 16px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 8px;
+      background: rgba(17, 21, 38, .72);
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .07);
+      padding: 0 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .pill strong {
+      color: var(--text);
+      margin-left: 6px;
+    }
+
+    .spirit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 430px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(28, 34, 55, .98), rgba(10, 13, 25, .98));
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    }
+
+    .card.owned {
+      border-color: rgba(53, 221, 123, .65);
+      box-shadow: 0 0 0 1px rgba(53, 221, 123, .15), 0 10px 30px rgba(0, 0, 0, .22);
+    }
+
+    .card.dominated {
+      border-color: rgba(255, 212, 71, .8);
+    }
+
+    .card.dominated::before {
+      content: "";
+      position: absolute;
+      top: 9px;
+      right: 14px;
+      z-index: 2;
+      width: 42px;
+      height: 26px;
+      background: linear-gradient(180deg, #fff16f 0%, #ffd447 42%, #f0a90a 100%);
+      clip-path: polygon(0 100%, 0 40%, 18% 66%, 32% 8%, 50% 56%, 70% 8%, 84% 66%, 100% 40%, 100% 100%);
+      filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .45));
+      transform: rotate(-4deg);
+    }
+
+    .card.dominated::after {
+      content: "";
+      position: absolute;
+      top: 31px;
+      right: 15px;
+      z-index: 3;
+      width: 40px;
+      height: 5px;
+      border-radius: 999px;
+      background: #e69608;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45);
+      transform: rotate(-4deg);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 42px 13px 0;
+    }
+
+    .spirit-name {
+      margin: 0;
+      color: var(--text);
+      font-size: 1.05rem;
+      line-height: 1.1;
+      text-transform: uppercase;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .variant {
+      flex: 0 0 auto;
+      align-self: start;
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: #10131f;
+      background: var(--accent);
+      font-size: .72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .variant.normal {
+      color: #111;
+      background: #f5f7ff;
+    }
+
+    .variant.dorado {
+      color: #191004;
+      background: #ffd447;
+    }
+
+    .variant.golosina {
+      color: #121018;
+      background: linear-gradient(135deg, #ff5b51, #35dd7b);
+    }
+
+    .variant.galactico {
+      color: #fff;
+      background: linear-gradient(135deg, #2357ff, #c554ff);
+    }
+
+    .variant.unico {
+      color: #131313;
+      background: #ffae36;
+    }
+
+    .image-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 240px;
+      margin: 14px 13px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(7, 10, 22, .44), rgba(7, 10, 22, .7)),
+        url("assets/fondo-espiritus.png") center / cover;
+    }
+
+    .image-wrap::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 55%;
+      height: 58%;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--spirit-color, #31d8ff) 28%, transparent);
+      filter: blur(18px);
+      opacity: .8;
+      transform: translate(-50%, -48%);
+    }
+
+    .image-wrap::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 28px;
+      width: 42%;
+      height: 16px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .48);
+      filter: blur(8px);
+      transform: translateX(-50%);
+    }
+
+    .image-wrap img {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: 232px;
+      object-fit: contain;
+      padding: 5px;
+      filter:
+        contrast(1.32)
+        saturate(1.28)
+        brightness(1.12)
+        drop-shadow(0 0 10px color-mix(in srgb, var(--spirit-color, #31d8ff) 62%, transparent))
+        drop-shadow(0 18px 18px rgba(0, 0, 0, .72));
+      mix-blend-mode: normal;
+      transform: scale(1.18);
+    }
+
+    .image-wrap.variant-galactico img {
+      transform: scale(1.03);
+    }
+
+    .image-wrap.spirit-goleador.variant-galactico img {
+      width: 82%;
+      transform: scale(1);
+    }
+
+    .missing {
+      display: none;
+      place-items: center;
+      width: 100%;
+      min-height: 240px;
+      padding: 16px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 800;
+      line-height: 1.35;
+      position: relative;
+      z-index: 1;
+    }
+
+    .image-wrap.no-image img {
+      display: none;
+    }
+
+    .image-wrap.no-image .missing {
+      display: grid;
+    }
+
+    .ability {
+      padding: 0 13px;
+      color: var(--muted);
+      font-size: .94rem;
+      line-height: 1.42;
+    }
+
+    .ability b {
+      color: var(--text);
+    }
+
+    .bonus {
+      margin: 10px 13px 0;
+      padding: 10px 12px;
+      border-radius: 4px;
+      color: #111525;
+      background: linear-gradient(105deg, #ffffff, #f5b4ef 48%, #dfffc2);
+      font-size: .9rem;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      padding: 12px 13px 13px;
+      border-top: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .owned-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--text);
+      font-size: .95rem;
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+      min-width: max-content;
+    }
+
+    .owned-toggle input {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+
+    .owned-toggle.dominated input {
+      accent-color: var(--accent);
+    }
+
+    .empty {
+      display: none;
+      padding: 28px;
+      border: 1px dashed rgba(255, 255, 255, .2);
+      border-radius: 8px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(17, 21, 38, .7);
+    }
+
+    @media (max-width: 1220px) {
+      .controls {
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+      }
+
+      .controls .button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .topbar,
+      .download-row {
+        grid-template-columns: 1fr;
+      }
+
+      .profile {
+        width: 100%;
+      }
+
+      .controls {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+      }
+
+      .download-row .button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        width: min(100% - 18px, 1500px);
+        padding-top: 10px;
+      }
+
+      .topbar,
+      .controls,
+      .download-row {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: clamp(1.75rem, 12vw, 2.5rem);
+        line-height: 1;
+      }
+
+      .brand-banner {
+        height: 140px;
+        object-fit: contain;
+        object-position: center;
+      }
+
+      .profile {
+        grid-template-columns: 1fr;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .controls,
+      .download-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .spirit-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: 0;
+      }
+
+      .card-head {
+        align-items: flex-start;
+      }
+
+      .image-wrap {
+        min-height: 220px;
+      }
+
+      .image-wrap img {
+        height: 212px;
+      }
+
+      .missing {
+        min-height: 220px;
+      }
+
+      .check-row {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .owned-toggle {
+        min-width: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <img class="brand-banner" src="assets/banner-noa-tylor.png" alt="Plantilla de Espiritus Noa Tylor ID Noa12Tylor">
+
+    <section class="topbar" aria-labelledby="page-title">
+      <div>
+        <h1 id="page-title">Plantilla de Espiritus</h1>
+      </div>
+
+      <form class="profile" id="profileForm">
+        <div class="field">
+          <label for="profileName">Usuario</label>
+          <input id="profileName" type="text" autocomplete="off" placeholder="Nombre de la persona">
+        </div>
+        <button class="button" type="submit">Usar</button>
+      </form>
+    </section>
+
+    <section class="controls" aria-label="Filtros">
+      <div class="field">
+        <label for="searchInput">Buscar</label>
+        <input id="searchInput" type="text" placeholder="Agua, fuego, parca...">
+      </div>
+
+      <div class="field">
+        <label for="typeFilter">Espiritu</label>
+        <select id="typeFilter"></select>
+      </div>
+
+      <div class="field">
+        <label for="variantFilter">Variante</label>
+        <select id="variantFilter"></select>
+      </div>
+
+      <button class="button secondary" id="onlyOwned" type="button" aria-pressed="false">Tengo</button>
+      <button class="button secondary" id="onlyDominated" type="button" aria-pressed="false">Dominados</button>
+      <button class="button secondary" id="resetFilters" type="button">Limpiar</button>
+    </section>
+
+    <section class="download-row" aria-label="Descarga">
+      <div class="field">
+        <label for="downloadMode">Descargar</label>
+        <select id="downloadMode">
+          <option value="all">Todos</option>
+          <option value="owned">Los que tengo</option>
+          <option value="missing">Los que no tengo</option>
+        </select>
+      </div>
+      <button class="button" id="downloadImage" type="button">Descargar imagen</button>
+    </section>
+
+    <section class="stats" aria-live="polite">
+      <span class="pill">Usuario <strong id="currentProfile">Invitado</strong></span>
+      <span class="pill">Tengo <strong id="ownedCount">0</strong></span>
+      <span class="pill">Dominados <strong id="dominatedCount">0</strong></span>
+      <span class="pill">Disponibles <strong id="totalCount">61</strong></span>
+      <span class="pill">Viendo <strong id="visibleCount">61</strong></span>
+    </section>
+
+    <section class="spirit-grid" id="spiritGrid" aria-label="Lista de espiritus"></section>
+    <p class="empty" id="emptyState">No hay espiritus con esos filtros.</p>
+  </main>
+
+  <script>
+    const variants = [
+      { id: "normal", label: "Normal" },
+      { id: "dorado", label: "Dorado", bonus: "Obten PE de bonificacion x3 con eliminaciones." },
+      { id: "golosina", label: "Golosina", bonus: "Obten un 20 % mas de polvo de espiritus al realizar una extraccion." },
+      { id: "galactico", label: "Galactico", bonus: "Obten un 30 % mas de municion al recogerla en el mundo." }
+    ];
+
+    const spirits = [
+      {
+        id: "agua",
+        name: "Espiritu de agua",
+        folder: "Espiritu de agua",
+        fileBase: "agua",
+        color: "#31d8ff",
+        ability: "Recupera el escudo mientras estas en el agua para ti y tu escuadron."
+      },
+      {
+        id: "fuego",
+        name: "Espiritu de fuego",
+        folder: "Espiritu de fuego",
+        fileBase: "fuego",
+        color: "#ff5b25",
+        ability: "Ocasiona un estallido de fuego cuando infliges suficiente dano a un enemigo."
+      },
+      {
+        id: "tierra",
+        name: "Espiritu de tierra",
+        folder: "Espiritu de tierra",
+        fileBase: "tierra",
+        color: "#35dd7b",
+        ability: "Tienes la posibilidad de encontrar objetos raros al abrir cofres."
+      },
+      {
+        id: "patito",
+        name: "Espiritu de patito",
+        folder: "Espiritu de patito",
+        fileBase: "patito",
+        color: "#ffd447",
+        ability: "Usar gestos o improvisar regenera el escudo."
+      },
+      {
+        id: "fantasma",
+        name: "Espiritu fantasma",
+        folder: "Espiritu de fantasma",
+        fileBase: "fantasma",
+        color: "#ff58bc",
+        ability: "Otorga invisibilidad por un tiempo al recargar."
+      },
+      {
+        id: "demonio",
+        name: "Espiritu demoniaco",
+        folder: "Espiritu de demonio",
+        fileBase: "demonio",
+        color: "#ff3333",
+        ability: "Otorga algo de vida y escudo al eliminar a un oponente."
+      },
+      {
+        id: "monarca",
+        name: "Espiritu monarca",
+        folder: "Espiritu de monarca",
+        fileBase: "monarca",
+        color: "#b279ff",
+        ability: "Tu pico inflige mas dano."
+      },
+      {
+        id: "dormilon",
+        name: "Espiritu dormilon",
+        folder: "Espiritu de dormilon",
+        fileBase: "dormilon",
+        color: "#44c7ff",
+        ability: "Otorga un objeto aleatorio cada vez que sube de nivel."
+      },
+      {
+        id: "punk",
+        name: "Espiritu punk",
+        folder: "Espiritu de punk",
+        fileBase: "punk",
+        color: "#ff477e",
+        ability: "A veces genera municion infinita."
+      },
+      {
+        id: "punto-cero",
+        name: "Espiritu del punto cero",
+        folder: "Espiritu de punto cero",
+        fileBase: "punto_cero",
+        color: "#c36bff",
+        ability: "Genera una burbuja al usar un objeto de curacion."
+      },
+      {
+        id: "aura",
+        name: "Espiritu de aura",
+        folder: "Espiritu de aura",
+        fileBase: "aura",
+        color: "#9fe8ff",
+        ability: "Gana una carga de roca de choque cuando infliges suficiente dano."
+      },
+      {
+        id: "parca",
+        name: "Espiritu de parca",
+        folder: "Espiritu de parca",
+        fileBase: "parca",
+        color: "#d7d7d7",
+        ability: "Cualquiera que te ataque queda marcado durante un tiempo."
+      },
+      {
+        id: "jefe",
+        name: "Espiritu jefe",
+        folder: "Espiritu de jefe",
+        fileBase: "jefe",
+        color: "#ff3c38",
+        ability: "Aumenta tu salud y escudo maximos al obtenerlo de cualquier jefe."
+      },
+      {
+        id: "palito-pez",
+        name: "Espiritu de palito de pez",
+        folder: "Espiritu de palito de pez",
+        fileBase: "palito_de_pez",
+        color: "#ff8f3c",
+        ability: "Aumenta considerablemente la velocidad de nado y da un breve aumento de movimiento al recibir dano."
+      },
+      {
+        id: "goleador",
+        name: "Espiritu goleador",
+        folder: "Espiritu de goleador",
+        fileBase: "goleador",
+        color: "#79d7ff",
+        ability: "Gana sobrecarga al saltar o rematar desbloqueado marcando un gol en el campo de futbol."
+      }
+    ];
+
+    const specialSpirits = [
+      {
+        id: "burntpeanut",
+        name: "BURNTPEANUT",
+        folder: "BURNTPEANUT",
+        fileBase: "burntpeanut",
+        variant: "unico",
+        variantLabel: "Unico",
+        color: "#ffae36",
+        ability: "Al eliminar a jugadores podrias encontrar mas botin, a veces mitico."
+      }
+    ];
+
+    const allCards = [
+      ...spirits.flatMap(spirit => variants.map(variant => ({
+        key: `${spirit.id}-${variant.id}`,
+        spiritId: spirit.id,
+        spiritName: spirit.name,
+        fileBase: spirit.fileBase,
+        folder: spirit.folder,
+        variant: variant.id,
+        variantLabel: variant.label,
+        ability: spirit.ability,
+        bonus: variant.bonus || "",
+        color: spirit.color,
+        image: `${spirit.folder}/${spirit.fileBase}_${variant.id}.png`
+      }))),
+      ...specialSpirits.map(spirit => ({
+        key: spirit.id,
+        spiritId: spirit.id,
+        spiritName: spirit.name,
+        fileBase: spirit.fileBase,
+        folder: spirit.folder,
+        variant: spirit.variant,
+        variantLabel: spirit.variantLabel,
+        ability: spirit.ability,
+        bonus: "",
+        color: spirit.color,
+        image: `${spirit.folder}/${spirit.fileBase}.png`
+      }))
+    ];
+
+    const grid = document.querySelector("#spiritGrid");
+    const profileForm = document.querySelector("#profileForm");
+    const profileName = document.querySelector("#profileName");
+    const currentProfile = document.querySelector("#currentProfile");
+    const searchInput = document.querySelector("#searchInput");
+    const typeFilter = document.querySelector("#typeFilter");
+    const variantFilter = document.querySelector("#variantFilter");
+    const onlyOwned = document.querySelector("#onlyOwned");
+    const onlyDominated = document.querySelector("#onlyDominated");
+    const resetFilters = document.querySelector("#resetFilters");
+    const downloadMode = document.querySelector("#downloadMode");
+    const downloadImage = document.querySelector("#downloadImage");
+    const ownedCount = document.querySelector("#ownedCount");
+    const dominatedCount = document.querySelector("#dominatedCount");
+    const totalCount = document.querySelector("#totalCount");
+    const visibleCount = document.querySelector("#visibleCount");
+    const emptyState = document.querySelector("#emptyState");
+
+    let activeProfile = localStorage.getItem("espiritus.activeProfile") || "Invitado";
+    let showOnlyOwned = false;
+    let showOnlyDominated = false;
+
+    function storageKey() {
+      return `espiritus.collection.${activeProfile.toLowerCase().trim()}`;
+    }
+
+    function loadCollection() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey())) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveCollection(collection) {
+      localStorage.setItem(storageKey(), JSON.stringify(collection));
+    }
+
+    function buildOptions() {
+      typeFilter.innerHTML = [
+        `<option value="all">Todos los espiritus</option>`,
+        ...spirits.map(spirit => `<option value="${spirit.id}">${spirit.name}</option>`),
+        `<option value="burntpeanut">BURNTPEANUT</option>`
+      ].join("");
+
+      variantFilter.innerHTML = [
+        `<option value="all">Todas las variantes</option>`,
+        ...variants.map(variant => `<option value="${variant.id}">${variant.label}</option>`),
+        `<option value="unico">Unico</option>`
+      ].join("");
+    }
+
+    function renderCards() {
+      const collection = loadCollection();
+      const query = searchInput.value.trim().toLowerCase();
+      const spiritValue = typeFilter.value;
+      const variantValue = variantFilter.value;
+
+      const filtered = allCards.filter(card => {
+        const matchesSearch = !query || `${card.spiritName} ${card.variantLabel} ${card.ability} ${card.bonus}`.toLowerCase().includes(query);
+        const matchesSpirit = spiritValue === "all" || card.spiritId === spiritValue;
+        const matchesVariant = variantValue === "all" || card.variant === variantValue;
+        const matchesOwned = !showOnlyOwned || collection[card.key];
+        const matchesDominated = !showOnlyDominated || collection[`dominated:${card.key}`];
+        return matchesSearch && matchesSpirit && matchesVariant && matchesOwned && matchesDominated;
+      });
+
+      grid.innerHTML = filtered.map(card => {
+        const checked = collection[card.key] ? "checked" : "";
+        const dominatedChecked = collection[`dominated:${card.key}`] ? "checked" : "";
+        const ownedClass = collection[card.key] ? " owned" : "";
+        const dominatedClass = collection[`dominated:${card.key}`] ? " dominated" : "";
+        const bonus = card.bonus ? `<p class="bonus">${card.bonus}</p>` : "";
+        return `
+          <article class="card${ownedClass}${dominatedClass}" style="--spirit-color:${card.color}" data-key="${card.key}">
+            <div class="card-head">
+              <h2 class="spirit-name" style="color:${card.color}">${card.spiritName}</h2>
+              <span class="variant ${card.variant}">${card.variantLabel}</span>
+            </div>
+            <div class="image-wrap spirit-${card.spiritId} variant-${card.variant}">
+              <img src="${card.image}" alt="${card.spiritName} ${card.variantLabel}" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror = null; this.parentElement.classList.add('no-image');">
+              <span class="missing">Imagen pendiente<br>${card.fileBase}${card.variant === "unico" ? "" : "_" + card.variant}.png</span>
+            </div>
+            <p class="ability"><b>Habilidad:</b> ${card.ability}</p>
+            ${bonus}
+            <div class="check-row">
+              <label class="owned-toggle">
+                <input type="checkbox" data-key="${card.key}" data-status="owned" ${checked}>
+                Lo tengo
+              </label>
+              <label class="owned-toggle dominated">
+                <input type="checkbox" data-key="${card.key}" data-status="dominated" ${dominatedChecked}>
+                Espiritu dominado
+              </label>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      updateStats(filtered.length);
+      emptyState.style.display = filtered.length ? "none" : "block";
+    }
+
+    function updateStats(visible) {
+      const collection = loadCollection();
+      const owned = allCards.filter(card => collection[card.key]).length;
+      const dominated = allCards.filter(card => collection[`dominated:${card.key}`]).length;
+      currentProfile.textContent = activeProfile;
+      ownedCount.textContent = owned;
+      dominatedCount.textContent = dominated;
+      totalCount.textContent = allCards.length;
+      visibleCount.textContent = visible;
+    }
+
+    function preloadSpiritImages() {
+      allCards.forEach(card => {
+        const image = new Image();
+        image.decoding = "async";
+        image.src = card.image;
+      });
+    }
+
+    function selectedRows() {
+      const collection = loadCollection();
+      const mode = downloadMode.value;
+      return allCards.filter(card => {
+        const hasCard = Boolean(collection[card.key]);
+        if (mode === "owned") return hasCard;
+        if (mode === "missing") return !hasCard;
+        return true;
+      });
+    }
+
+    function downloadFileName(extension) {
+      const labels = {
+        all: "todos",
+        owned: "los-que-tengo",
+        missing: "los-que-no-tengo"
+      };
+      const safeProfile = activeProfile.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-") || "invitado";
+      return `plantilla-espiritus-${safeProfile}-${labels[downloadMode.value]}.${extension}`;
+    }
+
+    function loadCanvasImage(src) {
+      return new Promise(resolve => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+        image.src = src;
+      });
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
+      const words = String(text).split(" ");
+      const lines = [];
+      let line = "";
+      words.forEach(word => {
+        const test = line ? `${line} ${word}` : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = test;
+        }
+      });
+      if (line) lines.push(line);
+      lines.slice(0, maxLines).forEach((currentLine, index) => {
+        const finalLine = index === maxLines - 1 && lines.length > maxLines ? `${currentLine}...` : currentLine;
+        ctx.fillText(finalLine, x, y + index * lineHeight);
+      });
+      return Math.min(lines.length, maxLines) * lineHeight;
+    }
+
+    function drawCrown(ctx, x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(-0.08);
+      const gradient = ctx.createLinearGradient(0, 0, 0, 28);
+      gradient.addColorStop(0, "#fff16f");
+      gradient.addColorStop(.45, "#ffd447");
+      gradient.addColorStop(1, "#e69608");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.moveTo(0, 28);
+      ctx.lineTo(0, 12);
+      ctx.lineTo(9, 20);
+      ctx.lineTo(17, 0);
+      ctx.lineTo(29, 18);
+      ctx.lineTo(42, 0);
+      ctx.lineTo(50, 20);
+      ctx.lineTo(60, 12);
+      ctx.lineTo(60, 28);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#d88705";
+      roundRect(ctx, 0, 25, 60, 7, 4);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    async function downloadPng() {
+      const collection = loadCollection();
+      const rows = selectedRows();
+      const columns = window.innerWidth < 640 ? 1 : window.innerWidth < 1050 ? 2 : 4;
+      const cardWidth = 280;
+      const cardHeight = 390;
+      const gap = 18;
+      const padding = 34;
+      const headerHeight = 128;
+      const canvasWidth = padding * 2 + columns * cardWidth + (columns - 1) * gap;
+      const rowCount = Math.max(1, Math.ceil(rows.length / columns));
+      const canvasHeight = padding * 2 + headerHeight + rowCount * cardHeight + (rowCount - 1) * gap;
+      const canvas = document.createElement("canvas");
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      const ctx = canvas.getContext("2d");
+
+      const bg = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
+      bg.addColorStop(0, "#080914");
+      bg.addColorStop(.48, "#171d31");
+      bg.addColorStop(1, "#080914");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      ctx.fillStyle = "#f7f8ff";
+      ctx.font = "900 42px Arial";
+      ctx.fillText("Plantilla de Espiritus", padding, 58);
+
+      const owned = rows.filter(card => collection[card.key]).length;
+      const dominated = rows.filter(card => collection[`dominated:${card.key}`]).length;
+      ctx.fillStyle = "#aeb8d7";
+      ctx.font = "800 20px Arial";
+      ctx.fillText(`Usuario: ${activeProfile}   |   Espiritus: ${rows.length}   |   Tengo: ${owned}   |   Dominados: ${dominated}`, padding, 94);
+
+      if (!rows.length) {
+        ctx.fillStyle = "#aeb8d7";
+        ctx.font = "800 28px Arial";
+        ctx.fillText("No hay espiritus para descargar con esta opcion.", padding, headerHeight + padding);
+      }
+
+      const images = await Promise.all(rows.map(card => loadCanvasImage(card.image)));
+      rows.forEach((card, index) => {
+        const col = index % columns;
+        const row = Math.floor(index / columns);
+        const x = padding + col * (cardWidth + gap);
+        const y = padding + headerHeight + row * (cardHeight + gap);
+        const isOwned = Boolean(collection[card.key]);
+        const isDominated = Boolean(collection[`dominated:${card.key}`]);
+
+        ctx.fillStyle = "#111526";
+        roundRect(ctx, x, y, cardWidth, cardHeight, 8);
+        ctx.fill();
+        ctx.strokeStyle = isDominated ? "#ffd447" : isOwned ? "#35dd7b" : "#2c3657";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        if (isDominated) drawCrown(ctx, x + cardWidth - 76, y + 12);
+
+        ctx.fillStyle = card.color;
+        ctx.font = "900 22px Arial";
+        wrapCanvasText(ctx, card.spiritName.toUpperCase(), x + 14, y + 42, cardWidth - 96, 25, 2);
+
+        ctx.fillStyle = card.variant === "galactico" ? "#7357ff" : card.variant === "golosina" ? "#ff8bcf" : card.variant === "dorado" ? "#ffd447" : "#f5f7ff";
+        roundRect(ctx, x + 14, y + 78, 112, 26, 13);
+        ctx.fill();
+        ctx.fillStyle = card.variant === "galactico" ? "#ffffff" : "#111525";
+        ctx.font = "900 13px Arial";
+        ctx.fillText(card.variantLabel.toUpperCase(), x + 25, y + 96);
+
+        ctx.fillStyle = "#0a0e1b";
+        roundRect(ctx, x + 14, y + 116, cardWidth - 28, 126, 8);
+        ctx.fill();
+        const image = images[index];
+        if (image) {
+          const boxW = cardWidth - 40;
+          const boxH = 112;
+          const scale = Math.min(boxW / image.width, boxH / image.height);
+          const drawW = image.width * scale;
+          const drawH = image.height * scale;
+          ctx.drawImage(image, x + (cardWidth - drawW) / 2, y + 123 + (boxH - drawH) / 2, drawW, drawH);
+        } else {
+          ctx.fillStyle = "#aeb8d7";
+          ctx.font = "800 16px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("Imagen pendiente", x + cardWidth / 2, y + 174);
+          ctx.textAlign = "left";
+        }
+
+        ctx.fillStyle = "#f7f8ff";
+        ctx.font = "900 15px Arial";
+        ctx.fillText("Habilidad:", x + 14, y + 268);
+        ctx.fillStyle = "#aeb8d7";
+        ctx.font = "700 14px Arial";
+        wrapCanvasText(ctx, card.ability, x + 14, y + 290, cardWidth - 28, 18, 3);
+
+        if (card.bonus) {
+          const bonusY = y + 337;
+          const bonusGradient = ctx.createLinearGradient(x + 14, bonusY, x + cardWidth - 14, bonusY + 38);
+          bonusGradient.addColorStop(0, "#ffffff");
+          bonusGradient.addColorStop(.55, "#f5b4ef");
+          bonusGradient.addColorStop(1, "#dfffc2");
+          ctx.fillStyle = bonusGradient;
+          roundRect(ctx, x + 14, bonusY, cardWidth - 28, 38, 4);
+          ctx.fill();
+          ctx.fillStyle = "#111525";
+          ctx.font = "800 13px Arial";
+          wrapCanvasText(ctx, card.bonus, x + 24, bonusY + 16, cardWidth - 48, 15, 2);
+        }
+      });
+
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = downloadFileName("png");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    profileForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const cleanName = profileName.value.trim() || "Invitado";
+      activeProfile = cleanName;
+      localStorage.setItem("espiritus.activeProfile", activeProfile);
+      renderCards();
+    });
+
+    grid.addEventListener("change", event => {
+      if (!event.target.matches("input[type='checkbox'][data-key]")) return;
+      const collection = loadCollection();
+      const statusKey = event.target.dataset.status === "dominated"
+        ? `dominated:${event.target.dataset.key}`
+        : event.target.dataset.key;
+      collection[statusKey] = event.target.checked;
+      saveCollection(collection);
+      renderCards();
+    });
+
+    [searchInput, typeFilter, variantFilter].forEach(control => {
+      control.addEventListener("input", renderCards);
+    });
+
+    onlyOwned.addEventListener("click", () => {
+      showOnlyOwned = !showOnlyOwned;
+      onlyOwned.setAttribute("aria-pressed", String(showOnlyOwned));
+      onlyOwned.textContent = showOnlyOwned ? "Todos" : "Tengo";
+      renderCards();
+    });
+
+    onlyDominated.addEventListener("click", () => {
+      showOnlyDominated = !showOnlyDominated;
+      onlyDominated.setAttribute("aria-pressed", String(showOnlyDominated));
+      onlyDominated.textContent = showOnlyDominated ? "Todos" : "Dominados";
+      renderCards();
+    });
+
+    resetFilters.addEventListener("click", () => {
+      searchInput.value = "";
+      typeFilter.value = "all";
+      variantFilter.value = "all";
+      showOnlyOwned = false;
+      showOnlyDominated = false;
+      onlyOwned.setAttribute("aria-pressed", "false");
+      onlyOwned.textContent = "Tengo";
+      onlyDominated.setAttribute("aria-pressed", "false");
+      onlyDominated.textContent = "Dominados";
+      renderCards();
+    });
+
+    downloadImage.addEventListener("click", downloadPng);
+
+    profileName.value = activeProfile;
+    buildOptions();
+    preloadSpiritImages();
+    renderCards();
+  </script>
+</body>
+</html>
