@@ -1033,9 +1033,28 @@
       ctx.restore();
     }
 
+    function drawOwnedMark(ctx, x, y, size) {
+      ctx.save();
+      ctx.fillStyle = "rgba(255, 55, 65, .92)";
+      ctx.beginPath();
+      ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 7;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(x + size * .3, y + size * .3);
+      ctx.lineTo(x + size * .7, y + size * .7);
+      ctx.moveTo(x + size * .7, y + size * .3);
+      ctx.lineTo(x + size * .3, y + size * .7);
+      ctx.stroke();
+      ctx.restore();
+    }
+
     async function downloadPng() {
       const collection = loadCollection();
       const rows = selectedRows();
+      const mode = downloadMode.value;
       const columns = 4;
       const cardWidth = 280;
       const cardHeight = 245;
@@ -1093,6 +1112,10 @@
           ctx.textAlign = "center";
           ctx.fillText("Imagen pendiente", x + cardWidth / 2, y + cardHeight / 2);
           ctx.textAlign = "left";
+        }
+
+        if (mode === "all" && collection[card.key]) {
+          drawOwnedMark(ctx, x + cardWidth - 60, y + 14, 42);
         }
       });
 
