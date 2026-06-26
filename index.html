@@ -148,7 +148,7 @@
 
     .controls {
       display: grid;
-      grid-template-columns: minmax(210px, 1fr) minmax(210px, 1fr) minmax(210px, 1fr) auto auto auto;
+      grid-template-columns: minmax(210px, 1fr) minmax(210px, 1fr) minmax(210px, 1fr) auto auto auto auto;
       gap: 12px;
       align-items: end;
       margin: 16px 0;
@@ -598,6 +598,7 @@
       </div>
 
       <button class="button secondary" id="onlyOwned" type="button" aria-pressed="false">Tengo</button>
+      <button class="button secondary" id="onlyMissing" type="button" aria-pressed="false">No tengo</button>
       <button class="button secondary" id="onlyDominated" type="button" aria-pressed="false">Dominados</button>
       <button class="button secondary" id="resetFilters" type="button">Limpiar</button>
     </section>
@@ -817,6 +818,7 @@
     const typeFilter = document.querySelector("#typeFilter");
     const variantFilter = document.querySelector("#variantFilter");
     const onlyOwned = document.querySelector("#onlyOwned");
+    const onlyMissing = document.querySelector("#onlyMissing");
     const onlyDominated = document.querySelector("#onlyDominated");
     const resetFilters = document.querySelector("#resetFilters");
     const downloadMode = document.querySelector("#downloadMode");
@@ -829,6 +831,7 @@
 
     let activeProfile = localStorage.getItem("espiritus.activeProfile") || "Invitado";
     let showOnlyOwned = false;
+    let showOnlyMissing = false;
     let showOnlyDominated = false;
 
     function storageKey() {
@@ -872,8 +875,9 @@
         const matchesSpirit = spiritValue === "all" || card.spiritId === spiritValue;
         const matchesVariant = variantValue === "all" || card.variant === variantValue;
         const matchesOwned = !showOnlyOwned || collection[card.key];
+        const matchesMissing = !showOnlyMissing || !collection[card.key];
         const matchesDominated = !showOnlyDominated || collection[`dominated:${card.key}`];
-        return matchesSearch && matchesSpirit && matchesVariant && matchesOwned && matchesDominated;
+        return matchesSearch && matchesSpirit && matchesVariant && matchesOwned && matchesMissing && matchesDominated;
       });
 
       grid.innerHTML = filtered.map(card => {
@@ -961,6 +965,12 @@
       });
     }
 
+    async function loadDownloadImage(card) {
+      const image = await loadCanvasImage(card.image);
+      if (image || !card.fallbackImage) return image;
+      return loadCanvasImage(card.fallbackImage);
+    }
+
     function roundRect(ctx, x, y, width, height, radius) {
       ctx.beginPath();
       ctx.moveTo(x + radius, y);
@@ -1028,10 +1038,10 @@
       const rows = selectedRows();
       const columns = window.innerWidth < 640 ? 1 : window.innerWidth < 1050 ? 2 : 4;
       const cardWidth = 280;
-      const cardHeight = 390;
+      const cardHeight = 245;
       const gap = 18;
       const padding = 34;
-      const headerHeight = 128;
+      const headerHeight = 0;
       const canvasWidth = padding * 2 + columns * cardWidth + (columns - 1) * gap;
       const rowCount = Math.max(1, Math.ceil(rows.length / columns));
       const canvasHeight = padding * 2 + headerHeight + rowCount * cardHeight + (rowCount - 1) * gap;
@@ -1047,89 +1057,42 @@
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      ctx.fillStyle = "#f7f8ff";
-      ctx.font = "900 42px Arial";
-      ctx.fillText("Plantilla de Espiritus", padding, 58);
-
-      const owned = rows.filter(card => collection[card.key]).length;
-      const dominated = rows.filter(card => collection[`dominated:${card.key}`]).length;
-      ctx.fillStyle = "#aeb8d7";
-      ctx.font = "800 20px Arial";
-      ctx.fillText(`Usuario: ${activeProfile}   |   Espiritus: ${rows.length}   |   Tengo: ${owned}   |   Dominados: ${dominated}`, padding, 94);
-
       if (!rows.length) {
         ctx.fillStyle = "#aeb8d7";
         ctx.font = "800 28px Arial";
         ctx.fillText("No hay espiritus para descargar con esta opcion.", padding, headerHeight + padding);
       }
 
-      const images = await Promise.all(rows.map(card => loadCanvasImage(card.image)));
+      const images = await Promise.all(rows.map(card => loadDownloadImage(card)));
       rows.forEach((card, index) => {
         const col = index % columns;
         const row = Math.floor(index / columns);
         const x = padding + col * (cardWidth + gap);
         const y = padding + headerHeight + row * (cardHeight + gap);
-        const isOwned = Boolean(collection[card.key]);
-        const isDominated = Boolean(collection[`dominated:${card.key}`]);
-
-        ctx.fillStyle = "#111526";
+        ctx.fillStyle = "#101526";
         roundRect(ctx, x, y, cardWidth, cardHeight, 8);
         ctx.fill();
-        ctx.strokeStyle = isDominated ? "#ffd447" : isOwned ? "#35dd7b" : "#2c3657";
+        ctx.strokeStyle = "#2c3657";
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        if (isDominated) drawCrown(ctx, x + cardWidth - 76, y + 12);
-
-        ctx.fillStyle = card.color;
-        ctx.font = "900 22px Arial";
-        wrapCanvasText(ctx, card.spiritName.toUpperCase(), x + 14, y + 42, cardWidth - 96, 25, 2);
-
-        ctx.fillStyle = card.variant === "galactico" ? "#7357ff" : card.variant === "golosina" ? "#ff8bcf" : card.variant === "dorado" ? "#ffd447" : "#f5f7ff";
-        roundRect(ctx, x + 14, y + 78, 112, 26, 13);
-        ctx.fill();
-        ctx.fillStyle = card.variant === "galactico" ? "#ffffff" : "#111525";
-        ctx.font = "900 13px Arial";
-        ctx.fillText(card.variantLabel.toUpperCase(), x + 25, y + 96);
-
         ctx.fillStyle = "#0a0e1b";
-        roundRect(ctx, x + 14, y + 116, cardWidth - 28, 126, 8);
+        roundRect(ctx, x + 14, y + 14, cardWidth - 28, cardHeight - 28, 8);
         ctx.fill();
         const image = images[index];
         if (image) {
           const boxW = cardWidth - 40;
-          const boxH = 112;
+          const boxH = cardHeight - 40;
           const scale = Math.min(boxW / image.width, boxH / image.height);
           const drawW = image.width * scale;
           const drawH = image.height * scale;
-          ctx.drawImage(image, x + (cardWidth - drawW) / 2, y + 123 + (boxH - drawH) / 2, drawW, drawH);
+          ctx.drawImage(image, x + (cardWidth - drawW) / 2, y + (cardHeight - drawH) / 2, drawW, drawH);
         } else {
           ctx.fillStyle = "#aeb8d7";
           ctx.font = "800 16px Arial";
           ctx.textAlign = "center";
-          ctx.fillText("Imagen pendiente", x + cardWidth / 2, y + 174);
+          ctx.fillText("Imagen pendiente", x + cardWidth / 2, y + cardHeight / 2);
           ctx.textAlign = "left";
-        }
-
-        ctx.fillStyle = "#f7f8ff";
-        ctx.font = "900 15px Arial";
-        ctx.fillText("Habilidad:", x + 14, y + 268);
-        ctx.fillStyle = "#aeb8d7";
-        ctx.font = "700 14px Arial";
-        wrapCanvasText(ctx, card.ability, x + 14, y + 290, cardWidth - 28, 18, 3);
-
-        if (card.bonus) {
-          const bonusY = y + 337;
-          const bonusGradient = ctx.createLinearGradient(x + 14, bonusY, x + cardWidth - 14, bonusY + 38);
-          bonusGradient.addColorStop(0, "#ffffff");
-          bonusGradient.addColorStop(.55, "#f5b4ef");
-          bonusGradient.addColorStop(1, "#dfffc2");
-          ctx.fillStyle = bonusGradient;
-          roundRect(ctx, x + 14, bonusY, cardWidth - 28, 38, 4);
-          ctx.fill();
-          ctx.fillStyle = "#111525";
-          ctx.font = "800 13px Arial";
-          wrapCanvasText(ctx, card.bonus, x + 24, bonusY + 16, cardWidth - 48, 15, 2);
         }
       });
 
@@ -1166,8 +1129,21 @@
 
     onlyOwned.addEventListener("click", () => {
       showOnlyOwned = !showOnlyOwned;
+      if (showOnlyOwned) showOnlyMissing = false;
       onlyOwned.setAttribute("aria-pressed", String(showOnlyOwned));
       onlyOwned.textContent = showOnlyOwned ? "Todos" : "Tengo";
+      onlyMissing.setAttribute("aria-pressed", "false");
+      onlyMissing.textContent = "No tengo";
+      renderCards();
+    });
+
+    onlyMissing.addEventListener("click", () => {
+      showOnlyMissing = !showOnlyMissing;
+      if (showOnlyMissing) showOnlyOwned = false;
+      onlyMissing.setAttribute("aria-pressed", String(showOnlyMissing));
+      onlyMissing.textContent = showOnlyMissing ? "Todos" : "No tengo";
+      onlyOwned.setAttribute("aria-pressed", "false");
+      onlyOwned.textContent = "Tengo";
       renderCards();
     });
 
@@ -1183,9 +1159,12 @@
       typeFilter.value = "all";
       variantFilter.value = "all";
       showOnlyOwned = false;
+      showOnlyMissing = false;
       showOnlyDominated = false;
       onlyOwned.setAttribute("aria-pressed", "false");
       onlyOwned.textContent = "Tengo";
+      onlyMissing.setAttribute("aria-pressed", "false");
+      onlyMissing.textContent = "No tengo";
       onlyDominated.setAttribute("aria-pressed", "false");
       onlyDominated.textContent = "Dominados";
       renderCards();
