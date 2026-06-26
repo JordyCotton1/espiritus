@@ -4,8 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plantilla de Espiritus</title>
-  <link rel="icon" type="image/png" href="icono.png">
-  <link rel="apple-touch-icon" href="icono.png">
+  <link rel="preload" as="image" href="assets/banner-noa-tylor-mobile.webp" media="(max-width: 560px)">
+  <link rel="preload" as="image" href="assets/banner-noa-tylor.webp" media="(min-width: 561px)">
+  <link rel="icon" type="image/png" href="icono-192.png">
+  <link rel="apple-touch-icon" href="icono-192.png">
   <style>
     :root {
       --bg: #080914;
@@ -312,7 +314,7 @@
       border-radius: 8px;
       background:
         linear-gradient(180deg, rgba(7, 10, 22, .44), rgba(7, 10, 22, .7)),
-        url("assets/fondo-espiritus.png") center / cover;
+        url("assets/fondo-espiritus.webp") center / cover;
     }
 
     .image-wrap::before {
@@ -560,7 +562,10 @@
 </head>
 <body>
   <main class="app">
-    <img class="brand-banner" src="assets/banner-noa-tylor.png" alt="Plantilla de Espiritus Noa Tylor ID Noa12Tylor">
+    <picture>
+      <source srcset="assets/banner-noa-tylor-mobile.webp" media="(max-width: 560px)">
+      <img class="brand-banner" src="assets/banner-noa-tylor.webp" alt="Plantilla de Espiritus Noa Tylor ID Noa12Tylor" fetchpriority="high" decoding="async">
+    </picture>
 
     <section class="topbar" aria-labelledby="page-title">
       <div>
@@ -765,6 +770,14 @@
       }
     ];
 
+    function thumbPath(folder, fileName) {
+      const slug = `${folder}__${fileName.replace(/\.png$/i, "")}`
+        .toLowerCase()
+        .replaceAll(" ", "_")
+        .replace(/[^a-z0-9_-]+/g, "");
+      return `assets/thumbs/${slug}.webp`;
+    }
+
     const allCards = [
       ...spirits.flatMap(spirit => variants.map(variant => ({
         key: `${spirit.id}-${variant.id}`,
@@ -777,7 +790,8 @@
         ability: spirit.ability,
         bonus: variant.bonus || "",
         color: spirit.color,
-        image: `${spirit.folder}/${spirit.fileBase}_${variant.id}.png`
+        image: thumbPath(spirit.folder, `${spirit.fileBase}_${variant.id}.png`),
+        fallbackImage: `${spirit.folder}/${spirit.fileBase}_${variant.id}.png`
       }))),
       ...specialSpirits.map(spirit => ({
         key: spirit.id,
@@ -790,7 +804,8 @@
         ability: spirit.ability,
         bonus: "",
         color: spirit.color,
-        image: `${spirit.folder}/${spirit.fileBase}.png`
+        image: thumbPath(spirit.folder, `${spirit.fileBase}.png`),
+        fallbackImage: `${spirit.folder}/${spirit.fileBase}.png`
       }))
     ];
 
@@ -874,7 +889,7 @@
               <span class="variant ${card.variant}">${card.variantLabel}</span>
             </div>
             <div class="image-wrap spirit-${card.spiritId} variant-${card.variant}">
-              <img src="${card.image}" alt="${card.spiritName} ${card.variantLabel}" loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror = null; this.parentElement.classList.add('no-image');">
+              <img src="${card.image}" data-fallback="${card.fallbackImage}" alt="${card.spiritName} ${card.variantLabel}" loading="eager" decoding="async" fetchpriority="high" onerror="if (!this.dataset.triedFallback && this.dataset.fallback && this.getAttribute('src') !== this.dataset.fallback) { this.dataset.triedFallback = '1'; this.src = this.dataset.fallback; } else { this.onerror = null; this.parentElement.classList.add('no-image'); }">
               <span class="missing">Imagen pendiente<br>${card.fileBase}${card.variant === "unico" ? "" : "_" + card.variant}.png</span>
             </div>
             <p class="ability"><b>Habilidad:</b> ${card.ability}</p>
